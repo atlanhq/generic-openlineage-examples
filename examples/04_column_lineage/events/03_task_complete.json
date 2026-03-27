@@ -1,0 +1,142 @@
+{
+  "eventTime": "2025-01-15T13:02:30.000Z",
+  "eventType": "COMPLETE",
+  "producer": "https://github.com/apache/airflow",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "880e8400-e29b-41d4-a716-446655440001",
+    "facets": {
+      "parent": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/ParentRunFacet.json#/$defs/ParentRunFacet",
+        "run": {
+          "runId": "880e8400-e29b-41d4-a716-446655440000"
+        },
+        "job": {
+          "namespace": "airflow-prod",
+          "name": "customer_metrics_pipeline"
+        }
+      }
+    }
+  },
+  "job": {
+    "namespace": "airflow-prod",
+    "name": "customer_metrics_pipeline.compute_metrics",
+    "facets": {
+      "jobType": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/2-0-3/JobTypeJobFacet.json#/$defs/JobTypeJobFacet",
+        "processingType": "BATCH",
+        "integration": "AIRFLOW",
+        "jobType": "TASK"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "bigquery",
+      "name": "analytics_db.raw.customer_events",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/apache/airflow",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-1/SchemaDatasetFacet.json#/$defs/SchemaDatasetFacet",
+          "fields": [
+            {"name": "customer_id", "type": "INTEGER"},
+            {"name": "order_id", "type": "INTEGER"},
+            {"name": "order_amount", "type": "FLOAT64"},
+            {"name": "event_timestamp", "type": "TIMESTAMP"},
+            {"name": "event_type", "type": "STRING"}
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "bigquery",
+      "name": "analytics_db.reporting.customer_metrics",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/apache/airflow",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-1/SchemaDatasetFacet.json#/$defs/SchemaDatasetFacet",
+          "fields": [
+            {"name": "customer_id", "type": "INTEGER"},
+            {"name": "total_orders", "type": "INTEGER"},
+            {"name": "lifetime_value", "type": "FLOAT64"},
+            {"name": "last_order_date", "type": "DATE"}
+          ]
+        },
+        "columnLineage": {
+          "_producer": "https://github.com/apache/airflow",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/ColumnLineageDatasetFacet.json#/$defs/ColumnLineageDatasetFacet",
+          "fields": {
+            "customer_id": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "analytics_db.raw.customer_events",
+                  "field": "customer_id",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Passed through unchanged"
+                    }
+                  ]
+                }
+              ]
+            },
+            "total_orders": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "analytics_db.raw.customer_events",
+                  "field": "order_id",
+                  "transformations": [
+                    {
+                      "type": "INDIRECT",
+                      "subtype": "AGGREGATE",
+                      "description": "COUNT(order_id) per customer"
+                    }
+                  ]
+                }
+              ]
+            },
+            "lifetime_value": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "analytics_db.raw.customer_events",
+                  "field": "order_amount",
+                  "transformations": [
+                    {
+                      "type": "INDIRECT",
+                      "subtype": "AGGREGATE",
+                      "description": "SUM(order_amount) per customer"
+                    }
+                  ]
+                }
+              ]
+            },
+            "last_order_date": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "analytics_db.raw.customer_events",
+                  "field": "event_timestamp",
+                  "transformations": [
+                    {
+                      "type": "INDIRECT",
+                      "subtype": "AGGREGATE",
+                      "description": "MAX(event_timestamp) cast to DATE per customer"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "eventTime": "2025-01-15T11:00:45.000Z",
+  "eventType": "COMPLETE",
+  "producer": "https://github.com/apache/airflow",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "660e8400-e29b-41d4-a716-446655440001",
+    "facets": {
+      "parent": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/ParentRunFacet.json#/$defs/ParentRunFacet",
+        "run": {
+          "runId": "660e8400-e29b-41d4-a716-446655440000"
+        },
+        "job": {
+          "namespace": "airflow-prod",
+          "name": "orders_sync_pipeline"
+        }
+      }
+    }
+  },
+  "job": {
+    "namespace": "airflow-prod",
+    "name": "orders_sync_pipeline.sync_orders",
+    "facets": {
+      "jobType": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/2-0-3/JobTypeJobFacet.json#/$defs/JobTypeJobFacet",
+        "processingType": "BATCH",
+        "integration": "AIRFLOW",
+        "jobType": "TASK"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "postgresql://db.internal:5432",
+      "name": "sales.public.orders",
+      "facets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "snowflake",
+      "name": "analytics.reporting.daily_orders",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/apache/airflow",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-1/SchemaDatasetFacet.json#/$defs/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "order_id",
+              "type": "integer",
+              "description": "Unique order identifier"
+            },
+            {
+              "name": "customer_id",
+              "type": "integer",
+              "description": "Customer who placed the order"
+            },
+            {
+              "name": "amount",
+              "type": "double",
+              "description": "Total order amount"
+            },
+            {
+              "name": "order_date",
+              "type": "date",
+              "description": "Date the order was placed"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

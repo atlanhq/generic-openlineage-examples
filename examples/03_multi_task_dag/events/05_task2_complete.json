@@ -1,0 +1,62 @@
+{
+  "eventTime": "2025-01-15T12:03:10.000Z",
+  "eventType": "COMPLETE",
+  "producer": "https://github.com/apache/airflow",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "770e8400-e29b-41d4-a716-446655440002",
+    "facets": {
+      "parent": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/ParentRunFacet.json#/$defs/ParentRunFacet",
+        "run": {
+          "runId": "770e8400-e29b-41d4-a716-446655440000"
+        },
+        "job": {
+          "namespace": "airflow-prod",
+          "name": "orders_pipeline"
+        }
+      }
+    }
+  },
+  "job": {
+    "namespace": "airflow-prod",
+    "name": "orders_pipeline.transform_orders",
+    "facets": {
+      "jobType": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/2-0-3/JobTypeJobFacet.json#/$defs/JobTypeJobFacet",
+        "processingType": "BATCH",
+        "integration": "AIRFLOW",
+        "jobType": "TASK"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "s3://atlan-data-lake",
+      "name": "raw/orders/2025-01-15",
+      "facets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "s3://atlan-data-lake",
+      "name": "processed/orders/2025-01-15",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/apache/airflow",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-1/SchemaDatasetFacet.json#/$defs/SchemaDatasetFacet",
+          "fields": [
+            {"name": "order_id", "type": "integer"},
+            {"name": "customer_id", "type": "integer"},
+            {"name": "amount_usd", "type": "double"},
+            {"name": "order_date", "type": "date"},
+            {"name": "status_normalized", "type": "string"},
+            {"name": "is_completed", "type": "boolean"}
+          ]
+        }
+      }
+    }
+  ]
+}

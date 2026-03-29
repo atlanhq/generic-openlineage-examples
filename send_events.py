@@ -20,6 +20,7 @@ load_dotenv()
 
 ENDPOINT = os.environ.get("OL_ENDPOINT")
 API_KEY = os.environ.get("API_KEY")
+NAMESPACE = os.environ.get("NAMESPACE")
 
 
 def validate_config():
@@ -29,6 +30,19 @@ def validate_config():
     if not API_KEY or "<your-api-key>" in API_KEY:
         print("ERROR: API_KEY not set. Copy .env.example to .env and fill in your values.")
         sys.exit(1)
+    if not NAMESPACE or "<your-connection>" in NAMESPACE:
+        print("ERROR: NAMESPACE not set. Copy .env.example to .env and fill in your values.")
+        sys.exit(1)
+
+
+def apply_namespace(event: dict) -> dict:
+    """Replace job namespace in the event with the value from NAMESPACE env var."""
+    if "job" in event:
+        event["job"]["namespace"] = NAMESPACE
+    parent = event.get("run", {}).get("facets", {}).get("parent", {})
+    if "job" in parent:
+        parent["job"]["namespace"] = NAMESPACE
+    return event
 
 
 def send_events(example_dir: str):
@@ -52,6 +66,8 @@ def send_events(example_dir: str):
     for event_file in event_files:
         with open(event_file) as f:
             event = json.load(f)
+
+        apply_namespace(event)
 
         try:
             resp = requests.post(ENDPOINT, json=event, headers=headers, timeout=30)

@@ -6,6 +6,14 @@
   "run": {
     "runId": "770e8400-e29b-41d4-a716-446655440002",
     "facets": {
+      "airflow": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunFacet",
+        "task": {
+          "task_id": "transform_orders",
+          "upstream_task_ids": "['extract_from_source']"
+        }
+      },
       "parent": {
         "_producer": "https://github.com/apache/airflow",
         "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/ParentRunFacet.json#/$defs/ParentRunFacet",
@@ -13,14 +21,14 @@
           "runId": "770e8400-e29b-41d4-a716-446655440000"
         },
         "job": {
-          "namespace": "airflow-prod",
+          "namespace": "<your-connection-name>",
           "name": "orders_pipeline"
         }
       }
     }
   },
   "job": {
-    "namespace": "airflow-prod",
+    "namespace": "<your-connection-name>",
     "name": "orders_pipeline.transform_orders",
     "facets": {
       "jobType": {

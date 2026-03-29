@@ -52,6 +52,24 @@ Transformation types:
 - `INDIRECT / AGGREGATE` — column is computed from an aggregation (COUNT, SUM, MAX, etc.)
 - `INDIRECT / TRANSFORM` — column is derived via a transformation
 
+## How it looks in Atlan
+
+![Asset list showing Process, Task, and DAG assets](resources/1.png)
+*Asset list — DAG, Task, and Process assets created*
+<br>
+
+![Pipeline view showing customer_events input and customer_metrics output via compute_metrics](resources/2.png)
+*Pipeline view — compute_metrics task with BigQuery input and output datasets*
+<br>
+
+![Table-level lineage from customer_events to customer_metrics](resources/3.png)
+*Table lineage — customer_events → customer_metrics via the Process*
+<br>
+
+![Column-level lineage showing customer_id mapped via compute_metrics ColumnProcess](resources/4.png)
+*Column lineage — customer_id column mapped through the compute_metrics ColumnProcess*
+<br>
+
 ## Run it
 
 ```bash

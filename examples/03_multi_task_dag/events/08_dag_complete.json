@@ -15,7 +15,7 @@
     }
   },
   "job": {
-    "namespace": "airflow-prod",
+    "namespace": "<your-connection-name>",
     "name": "orders_pipeline",
     "facets": {
       "jobType": {

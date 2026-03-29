@@ -13,14 +13,14 @@
           "runId": "880e8400-e29b-41d4-a716-446655440000"
         },
         "job": {
-          "namespace": "airflow-prod",
+          "namespace": "<your-connection-name>",
           "name": "customer_metrics_pipeline"
         }
       }
     }
   },
   "job": {
-    "namespace": "airflow-prod",
+    "namespace": "<your-connection-name>",
     "name": "customer_metrics_pipeline.compute_metrics",
     "facets": {
       "jobType": {

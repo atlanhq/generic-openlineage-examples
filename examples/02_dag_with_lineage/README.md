@@ -26,6 +26,24 @@ Demonstrates Process asset creation and dataset lineage. A single task reads fro
 - `outputs[].facets.schema` carries the column definitions — these become Column assets on the Snowflake table
 - Inputs/outputs only need to be present on the COMPLETE event (the connector uses the terminal event for lineage)
 
+## How it looks in Atlan
+
+![Asset list showing DAG, Task, Process assets](resources/1.png)
+*Asset list — DAG, Task, and Process assets created*
+<br>
+
+![DAG overview with workflow run summary](resources/2.png)
+*DAG overview with workflow run summary*
+<br>
+
+![Pipeline view showing lineage from orders to daily_orders via sync_orders](resources/3.png)
+*Pipeline view — lineage from Postgres orders to Snowflake daily_orders via sync_orders*
+<br>
+
+![Pipeline view with sync_orders task detail panel](resources/4.png)
+*sync_orders task detail — run ID, last run status, and parent DAG*
+<br>
+
 ## Run it
 
 ```bash

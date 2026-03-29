@@ -14,7 +14,7 @@
     }
   },
   "job": {
-    "namespace": "airflow-prod",
+    "namespace": "<your-connection-name>",
     "name": "daily_etl_pipeline",
     "facets": {
       "jobType": {

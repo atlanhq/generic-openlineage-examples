@@ -13,14 +13,14 @@
           "runId": "660e8400-e29b-41d4-a716-446655440000"
         },
         "job": {
-          "namespace": "airflow-prod",
+          "namespace": "<your-connection-name>",
           "name": "orders_sync_pipeline"
         }
       }
     }
   },
   "job": {
-    "namespace": "airflow-prod",
+    "namespace": "<your-connection-name>",
     "name": "orders_sync_pipeline.sync_orders",
     "facets": {
       "jobType": {

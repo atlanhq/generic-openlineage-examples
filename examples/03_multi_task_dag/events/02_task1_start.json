@@ -13,14 +13,14 @@
           "runId": "770e8400-e29b-41d4-a716-446655440000"
         },
         "job": {
-          "namespace": "airflow-prod",
+          "namespace": "<your-connection-name>",
           "name": "orders_pipeline"
         }
       }
     }
   },
   "job": {
-    "namespace": "airflow-prod",
+    "namespace": "<your-connection-name>",
     "name": "orders_pipeline.extract_from_source",
     "facets": {
       "jobType": {
@@ -32,6 +32,30 @@
       }
     }
   },
-  "inputs": [],
-  "outputs": []
+  "inputs": [
+    {
+      "namespace": "postgresql://db.internal:5432",
+      "name": "sales.public.raw_orders",
+      "facets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "s3://atlan-data-lake",
+      "name": "raw/orders/2025-01-15",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/apache/airflow",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-1/SchemaDatasetFacet.json#/$defs/SchemaDatasetFacet",
+          "fields": [
+            {"name": "order_id", "type": "integer"},
+            {"name": "customer_id", "type": "integer"},
+            {"name": "amount", "type": "double"},
+            {"name": "order_date", "type": "date"},
+            {"name": "status", "type": "string"}
+          ]
+        }
+      }
+    }
+  ]
 }

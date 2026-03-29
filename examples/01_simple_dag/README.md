@@ -13,8 +13,8 @@ Demonstrates basic FlowControlOperation creation with a parent DAG and a single 
 
 ## What appears in Atlan
 
-- **1 parent FlowControlOperation**: `daily_etl_pipeline` with status COMPLETE
-- **1 child FlowControlOperation**: `validate_data` nested under the parent, with status COMPLETE
+- **1 DAG**: `daily_etl_pipeline` with status Success
+- **1 Task**: `validate_data` nested under the parent, with status Success
 
 No Process or lineage assets are created because there are no input/output datasets.
 
@@ -24,8 +24,21 @@ No Process or lineage assets are created because there are no input/output datas
 - `run.facets.parent` in the task events links them to the parent DAG run
 - `job.name` for the child follows the convention `<dag-name>.<task-name>`
 
+## How it looks in Atlan
+
+![Asset list showing the DAG, Task, and Connection](resources/1.png)
+*Asset list — DAG, Task, and Connection*
+<br>
+
+![DAG overview with workflow run summary](resources/2.png)
+*DAG overview with workflow run summary*
+<br>
+![Pipeline view showing validate_data task under daily_etl_pipeline](resources/3.png)
+*Pipeline view — validate_data task nested under daily_etl_pipeline*
+
 ## Run it
 
 ```bash
 python send_events.py examples/01_simple_dag
 ```
+

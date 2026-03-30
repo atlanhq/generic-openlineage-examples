@@ -1,0 +1,17 @@
+{
+  "eventTime": "2025-03-10T10:05:45.000Z",
+  "eventType": "COMPLETE",
+  "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "bb0e8400-e29b-41d4-a716-446655440000",
+    "facets": {}
+  },
+  "job": {
+    "namespace": "<your-connection-name>",
+    "name": "customer_analytics",
+    "facets": {}
+  },
+  "inputs": [],
+  "outputs": []
+}

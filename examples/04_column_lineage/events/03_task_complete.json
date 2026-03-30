@@ -94,7 +94,7 @@
                   "field": "order_id",
                   "transformations": [
                     {
-                      "type": "INDIRECT",
+                      "type": "DIRECT",
                       "subtype": "AGGREGATE",
                       "description": "COUNT(order_id) per customer"
                     }
@@ -110,7 +110,7 @@
                   "field": "order_amount",
                   "transformations": [
                     {
-                      "type": "INDIRECT",
+                      "type": "DIRECT",
                       "subtype": "AGGREGATE",
                       "description": "SUM(order_amount) per customer"
                     }
@@ -126,7 +126,7 @@
                   "field": "event_timestamp",
                   "transformations": [
                     {
-                      "type": "INDIRECT",
+                      "type": "DIRECT",
                       "subtype": "AGGREGATE",
                       "description": "MAX(event_timestamp) cast to DATE per customer"
                     }

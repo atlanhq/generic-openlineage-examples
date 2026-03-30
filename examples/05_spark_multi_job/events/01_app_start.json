@@ -1,0 +1,46 @@
+{
+  "eventTime": "2025-03-10T09:00:00.000Z",
+  "eventType": "START",
+  "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "aa0e8400-e29b-41d4-a716-446655440000",
+    "facets": {
+      "spark_version": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+        "_schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunFacet",
+        "spark-version": "3.5.0",
+        "openlineage-spark-version": "1.1.0"
+      },
+      "spark_properties": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+        "_schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunFacet",
+        "properties": {
+          "spark.master": "yarn",
+          "spark.app.name": "ecommerce_pipeline",
+          "spark.submit.deployMode": "cluster"
+        }
+      },
+      "environment-properties": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+        "_schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunFacet",
+        "environment-properties": {}
+      }
+    }
+  },
+  "job": {
+    "namespace": "<your-connection-name>",
+    "name": "ecommerce_pipeline",
+    "facets": {
+      "jobType": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+        "_schemaURL": "https://openlineage.io/spec/facets/2-0-3/JobTypeJobFacet.json#/$defs/JobTypeJobFacet",
+        "processingType": "BATCH",
+        "integration": "SPARK",
+        "jobType": "APPLICATION"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": []
+}

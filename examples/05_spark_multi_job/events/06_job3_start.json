@@ -1,0 +1,112 @@
+{
+  "eventTime": "2025-03-10T09:04:35.000Z",
+  "eventType": "START",
+  "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "aa0e8400-e29b-41d4-a716-446655440003",
+    "facets": {
+      "parent": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/ParentRunFacet.json#/$defs/ParentRunFacet",
+        "job": {
+          "namespace": "<your-connection-name>",
+          "name": "ecommerce_pipeline"
+        },
+        "run": {
+          "runId": "aa0e8400-e29b-41d4-a716-446655440000"
+        }
+      }
+    }
+  },
+  "job": {
+    "namespace": "<your-connection-name>",
+    "name": "ecommerce_pipeline.transform_sales_data",
+    "facets": {
+      "jobType": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+        "_schemaURL": "https://openlineage.io/spec/facets/2-0-3/JobTypeJobFacet.json#/$defs/JobTypeJobFacet",
+        "processingType": "BATCH",
+        "integration": "SPARK",
+        "jobType": "JOB"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "mysql://db.ecommerce.internal:3306",
+      "name": "ecommerce.public.raw_orders",
+      "facets": {
+        "dataSource": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json#/$defs/DatasourceDatasetFacet",
+          "name": "mysql://db.ecommerce.internal:3306",
+          "uri": "mysql://db.ecommerce.internal:3306"
+        },
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json#/$defs/SchemaDatasetFacet",
+          "fields": [
+            {"name": "order_id", "type": "long"},
+            {"name": "customer_id", "type": "long"},
+            {"name": "product_id", "type": "long"},
+            {"name": "quantity", "type": "integer"},
+            {"name": "unit_price", "type": "double"},
+            {"name": "order_date", "type": "date"},
+            {"name": "status", "type": "string"}
+          ]
+        }
+      },
+      "inputFacets": {}
+    },
+    {
+      "namespace": "mysql://db.ecommerce.internal:3306",
+      "name": "ecommerce.public.raw_customers",
+      "facets": {
+        "dataSource": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json#/$defs/DatasourceDatasetFacet",
+          "name": "mysql://db.ecommerce.internal:3306",
+          "uri": "mysql://db.ecommerce.internal:3306"
+        },
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json#/$defs/SchemaDatasetFacet",
+          "fields": [
+            {"name": "customer_id", "type": "long"},
+            {"name": "customer_name", "type": "string"},
+            {"name": "region", "type": "string"},
+            {"name": "segment", "type": "string"}
+          ]
+        }
+      },
+      "inputFacets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "bigquery://project.region",
+      "name": "analytics.sales.daily_sales_summary",
+      "facets": {
+        "dataSource": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json#/$defs/DatasourceDatasetFacet",
+          "name": "bigquery://project.region",
+          "uri": "bigquery://project.region"
+        },
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json#/$defs/SchemaDatasetFacet",
+          "fields": [
+            {"name": "order_date", "type": "date"},
+            {"name": "region", "type": "string"},
+            {"name": "segment", "type": "string"},
+            {"name": "total_orders", "type": "long"},
+            {"name": "total_revenue", "type": "double"}
+          ]
+        }
+      },
+      "outputFacets": {}
+    }
+  ]
+}

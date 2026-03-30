@@ -1,0 +1,37 @@
+{
+  "eventTime": "2025-03-10T09:02:20.000Z",
+  "eventType": "START",
+  "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "aa0e8400-e29b-41d4-a716-446655440002",
+    "facets": {
+      "parent": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/ParentRunFacet.json#/$defs/ParentRunFacet",
+        "job": {
+          "namespace": "<your-connection-name>",
+          "name": "ecommerce_pipeline"
+        },
+        "run": {
+          "runId": "aa0e8400-e29b-41d4-a716-446655440000"
+        }
+      }
+    }
+  },
+  "job": {
+    "namespace": "<your-connection-name>",
+    "name": "ecommerce_pipeline.load_reference_data",
+    "facets": {
+      "jobType": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.1.0/integration/spark",
+        "_schemaURL": "https://openlineage.io/spec/facets/2-0-3/JobTypeJobFacet.json#/$defs/JobTypeJobFacet",
+        "processingType": "BATCH",
+        "integration": "SPARK",
+        "jobType": "JOB"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": []
+}

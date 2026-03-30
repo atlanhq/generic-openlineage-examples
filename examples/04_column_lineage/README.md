@@ -20,9 +20,9 @@ Demonstrates the `columnLineage` facet, which creates ColumnProcess assets in At
 - **BigQuery output table** (partial): `analytics_db.reporting.customer_metrics` with columns `customer_id`, `total_orders`, `lifetime_value`, `last_order_date`
 - **4 ColumnProcess assets** (one per output column):
   - `customer_id` ← `customer_events.customer_id` (DIRECT / IDENTITY — pass-through)
-  - `total_orders` ← `customer_events.order_id` (INDIRECT / AGGREGATE — COUNT)
-  - `lifetime_value` ← `customer_events.order_amount` (INDIRECT / AGGREGATE — SUM)
-  - `last_order_date` ← `customer_events.event_timestamp` (INDIRECT / AGGREGATE — MAX)
+  - `total_orders` ← `customer_events.order_id` (DIRECT / AGGREGATE — COUNT)
+  - `lifetime_value` ← `customer_events.order_amount` (DIRECT / AGGREGATE — SUM)
+  - `last_order_date` ← `customer_events.event_timestamp` (DIRECT / AGGREGATE — MAX)
 
 ## Key fields
 
@@ -47,10 +47,12 @@ The `columnLineage` facet lives under `outputs[].facets.columnLineage.fields`. E
 }
 ```
 
-Transformation types:
+Transformation types (only `type: "DIRECT"` produces ColumnProcess assets in Atlan):
 - `DIRECT / IDENTITY` — column is copied as-is
-- `INDIRECT / AGGREGATE` — column is computed from an aggregation (COUNT, SUM, MAX, etc.)
-- `INDIRECT / TRANSFORM` — column is derived via a transformation
+- `DIRECT / AGGREGATE` — column is computed from an aggregation (COUNT, SUM, MAX, etc.)
+- `DIRECT / TRANSFORM` — column is derived via a transformation
+
+Note: `type: "INDIRECT"` entries are silently skipped by the connector and will not produce column lineage, regardless of subtype.
 
 ## How it looks in Atlan
 
@@ -58,16 +60,16 @@ Transformation types:
 *Asset list — DAG, Task, and Process assets created*
 <br>
 
-![Pipeline view showing customer_events input and customer_metrics output via compute_metrics](resources/2.png)
-*Pipeline view — compute_metrics task with BigQuery input and output datasets*
+![Pipeline view showing customer_metrics_pipeline DAG with customer_events input, compute_metrics task, and customer_metrics output](resources/2.png)
+*Pipeline view — customer_metrics_pipeline DAG orchestrating compute_metrics, with customer_events as input and customer_metrics as output*
 <br>
 
 ![Table-level lineage from customer_events to customer_metrics](resources/3.png)
 *Table lineage — customer_events → customer_metrics via the Process*
 <br>
 
-![Column-level lineage showing customer_id mapped via compute_metrics ColumnProcess](resources/4.png)
-*Column lineage — customer_id column mapped through the compute_metrics ColumnProcess*
+![Column-level lineage showing order_amount mapped to lifetime_value](resources/4.png)
+*Column lineage — order_amount (customer_events) mapped to lifetime_value (customer_metrics) via a ColumnProcess*
 <br>
 
 ## Run it

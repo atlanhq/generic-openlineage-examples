@@ -1,0 +1,45 @@
+{
+  "eventTime": "2025-01-15T12:01:35.000Z",
+  "eventType": "START",
+  "producer": "https://github.com/apache/airflow",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "770e8400-e29b-41d4-a716-446655440002",
+    "facets": {
+      "airflow": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunFacet",
+        "task": {
+          "task_id": "transform_orders",
+          "upstream_task_ids": "['extract_from_source']"
+        }
+      },
+      "parent": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/ParentRunFacet.json#/$defs/ParentRunFacet",
+        "run": {
+          "runId": "770e8400-e29b-41d4-a716-446655440000"
+        },
+        "job": {
+          "namespace": "<your-connection-name>",
+          "name": "orders_pipeline"
+        }
+      }
+    }
+  },
+  "job": {
+    "namespace": "<your-connection-name>",
+    "name": "orders_pipeline.transform_orders",
+    "facets": {
+      "jobType": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/2-0-3/JobTypeJobFacet.json#/$defs/JobTypeJobFacet",
+        "processingType": "BATCH",
+        "integration": "AIRFLOW",
+        "jobType": "TASK"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": []
+}

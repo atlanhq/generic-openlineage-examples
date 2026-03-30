@@ -1,0 +1,41 @@
+{
+  "eventTime": "2025-01-15T12:05:05.000Z",
+  "eventType": "COMPLETE",
+  "producer": "https://github.com/apache/airflow",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "770e8400-e29b-41d4-a716-446655440000",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/NominalTimeRunFacet.json#/$defs/NominalTimeRunFacet",
+        "nominalStartTime": "2025-01-15T12:00:00.000Z",
+        "nominalEndTime": "2025-01-15T12:05:05.000Z"
+      }
+    }
+  },
+  "job": {
+    "namespace": "<your-connection-name>",
+    "name": "orders_pipeline",
+    "facets": {
+      "jobType": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/2-0-3/JobTypeJobFacet.json#/$defs/JobTypeJobFacet",
+        "processingType": "NONE",
+        "integration": "AIRFLOW",
+        "jobType": "DAG"
+      },
+      "ownership": {
+        "_producer": "https://github.com/apache/airflow",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json#/$defs/OwnershipJobFacet",
+        "owners": [
+          {
+            "name": "data-engineering-team"
+          }
+        ]
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": []
+}

@@ -1,47 +1,32 @@
 # OpenLineage Sample Events for Atlan
 
-A collection of runnable OpenLineage event examples for testing and validating your Atlan Generic OpenLineage connector setup.
-
-Send these events to your Atlan tenant to see FlowControlOperations, Processes, and lineage assets appear in the UI.
-
----
-
-## Prerequisites
-
-- Python 3.8+
-- An Atlan tenant with the Generic OpenLineage connector configured
-- An Atlan API key (Settings → API Keys)
+Sample OpenLineage events — and an app to send them — for testing and validating your
+Atlan Generic OpenLineage connector. Send events to your tenant and watch
+FlowControlOperations, Processes, and lineage assets appear in the UI.
 
 ---
 
-## Setup
+## OpenLineage Studio
+
+The easiest way to send these events is **[OpenLineage Studio](studio/)** — a small local
+app. Pick an example, see the OpenLineage payload prefilled, hit **Send**, and watch
+assets land under your connection in Atlan. No terminal, no copy-paste, and no
+`npm install`.
 
 ```bash
-# 1. Clone this repo
-git clone https://github.com/atlanhq/generic-openlineage-examples
-cd generic-openlineage-examples
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Configure your endpoint
-cp .env.example .env
-# Edit .env and fill in OL_ENDPOINT and API_KEY
+cd studio
+node serve.mjs        # opens http://localhost:5174
 ```
 
----
-
-## Usage
-
-```bash
-python send_events.py examples/01_simple_dag
-```
-
-The script reads all `.json` files from the example's `events/` directory in sorted order and POSTs each one to your Atlan endpoint. Status is printed for each event.
+Requires **Node 20+**. It walks you through a one-time setup — your Atlan URL, an API
+key, and the connection to send to — then you pick any example and send. Full details in
+[studio/README.md](studio/).
 
 ---
 
 ## Examples
+
+Studio and the Python CLI both send the same sample events:
 
 | # | Example | Events | What appears in Atlan |
 |---|---------|--------|----------------------|
@@ -49,6 +34,22 @@ The script reads all `.json` files from the example's `events/` directory in sor
 | 02 | [DAG with table lineage](examples/02_dag_with_lineage/) | 4 | FCOs + Process + Postgres input → Snowflake output |
 | 03 | [Multi-task DAG](examples/03_multi_task_dag/) | 8 | 3 child FCOs, Postgres → S3 → S3 → Snowflake lineage chain |
 | 04 | [Column-level lineage](examples/04_column_lineage/) | 4 | FCOs + Process + ColumnProcess assets (BigQuery → BigQuery) |
+| 05 | [Spark multi-job application](examples/05_spark_multi_job/) | 8 | Parent Application FCO + 3 job FCOs, MySQL ×2 → BigQuery lineage |
+| 06 | [Spark column-level lineage](examples/06_spark_cll/) | 4 | Application + job FCO + Process + ColumnProcess (PostgreSQL ×2 → Redshift) |
+
+---
+
+## Send from a script (Python CLI)
+
+Prefer a terminal or CI pipeline? `send_events.py` POSTs an example's events to your
+endpoint:
+
+```bash
+python send_events.py examples/01_simple_dag
+```
+
+See [docs/send-events-cli.md](docs/send-events-cli.md) for setup (Python dependencies
+and `.env`).
 
 ---
 

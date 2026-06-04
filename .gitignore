@@ -95,3 +95,10 @@ logs/
 *.tgz
 *.rar
 *.7z
+
+# ─── OpenLineage Studio ─────────────────────────────────────────────────────
+# The `dist/` rule above (Python) also matches studio/dist. Studio ships a
+# prebuilt dist/ on purpose so customers can run `node serve.mjs` with zero
+# `npm install`. Re-include it (but keep node_modules ignored).
+!studio/dist/
+!studio/dist/**

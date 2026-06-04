@@ -4,6 +4,13 @@ A collection of runnable OpenLineage event examples for testing and validating y
 
 Send these events to your Atlan tenant to see FlowControlOperations, Processes, and lineage assets appear in the UI.
 
+There are two ways to send them:
+
+- **[OpenLineage Studio](studio/)** — an interactive local UI. Pick an example, see the
+  payload prefilled, hit **Send**, and watch assets land in Atlan. No terminal,
+  no copy-paste. Runs with zero `npm install`: `cd studio && node serve.mjs`.
+- **`send_events.py`** — a minimal Python CLI for scripted/CI use (below).
+
 ---
 
 ## Prerequisites

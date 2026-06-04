@@ -29,7 +29,30 @@ import { completeOnboarding, type AtlanSession } from '@/lib/session'
 
 type StepId = 'tenant' | 'token' | 'connection'
 
-const TENANT_RE = /^[a-z0-9](?:[a-z0-9-]{0,40}[a-z0-9])?$/
+/**
+ * Accept either a bare tenant prefix ("acme" → acme.atlan.com) or a full host
+ * for dev / vanity / custom domains ("main.atlan.dev", "https://my.atlan.io").
+ * normalizeHost() does the expansion; we just confirm it yields a real URL.
+ */
+function hostLooksValid(raw: string): boolean {
+  const h = normalizeHost(raw)
+  if (!h) return false
+  try {
+    const u = new URL(h)
+    return (
+      (u.protocol === 'https:' || u.protocol === 'http:') &&
+      u.hostname.includes('.')
+    )
+  } catch {
+    return false
+  }
+}
+
+/** True when the input is a bare prefix we should suffix with ".atlan.com". */
+function isBarePrefix(raw: string): boolean {
+  const p = raw.trim()
+  return !!p && !/[.:/]/.test(p) && !p.toLowerCase().startsWith('http')
+}
 
 export function OnboardingFlow({
   onDone,
@@ -47,9 +70,13 @@ export function OnboardingFlow({
   const [chosenGuid, setChosenGuid] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Manual fallback: skip metadata discovery and name the connection yourself.
+  const [manual, setManual] = useState(false)
+  const [manualName, setManualName] = useState('')
+  const [manualConnector, setManualConnector] = useState('generic-openlineage')
 
   const host = useMemo(() => normalizeHost(prefix), [prefix])
-  const tenantValid = TENANT_RE.test(prefix.trim().toLowerCase())
+  const tenantValid = hostLooksValid(prefix)
   const tokenClassified = token ? classifyToken(token) : null
   const tokenLooksOk = !!tokenClassified?.ok
 
@@ -57,6 +84,13 @@ export function OnboardingFlow({
     setError(null)
     if (step === 'token') setStep('tenant')
     else if (step === 'connection') setStep('token')
+  }
+
+  /** Jump to the connection step in manual mode — no metadata call needed. */
+  function goManual() {
+    setError(null)
+    setManual(true)
+    setStep('connection')
   }
 
   async function verifyTokenAndContinue() {
@@ -70,6 +104,7 @@ export function OnboardingFlow({
     setBusy(true)
     try {
       const conns = await listConnections(host, token.trim())
+      setManual(false)
       setConnections(conns)
       setChosenGuid(conns[0]?.guid ?? null)
       setStep('connection')
@@ -77,7 +112,7 @@ export function OnboardingFlow({
       if (e instanceof AtlanApiError) {
         if (e.status === 401 || e.status === 403) {
           setError(
-            "Atlan rejected this token. Make sure it's a current API key for this tenant.",
+            `Atlan rejected this token for connection lookup (HTTP ${e.status}). This can happen if the key lacks metadata access, or if this host only handles event ingestion. The key may still be able to send events — use "enter a connection manually" below.`,
           )
         } else if (e.status === 502 || e.status === 504) {
           setError(
@@ -115,6 +150,23 @@ export function OnboardingFlow({
   }
 
   function finish() {
+    if (manual) {
+      const name = manualName.trim()
+      const connector = manualConnector.trim() || 'generic-openlineage'
+      if (!name || !connector) return
+      const conn: AtlanConnection = {
+        guid: '',
+        name,
+        qualifiedName: '',
+      }
+      const next = completeOnboarding({
+        tenantHost: host,
+        apiToken: token.trim(),
+        connection: { name, qualifiedName: '', connectorType: connector },
+      })
+      onDone(next, [conn])
+      return
+    }
     const chosen = connections?.find((c) => c.guid === chosenGuid)
     if (!chosen) return
     const next = completeOnboarding({
@@ -124,6 +176,7 @@ export function OnboardingFlow({
         name: chosen.name,
         qualifiedName: chosen.qualifiedName,
         guid: chosen.guid,
+        connectorType: 'generic-openlineage',
       },
     })
     onDone(next, connections ?? [])
@@ -193,6 +246,7 @@ export function OnboardingFlow({
               busy={busy}
               onBack={back}
               onContinue={verifyTokenAndContinue}
+              onManual={goManual}
             />
           )}
           {step === 'connection' && (
@@ -206,6 +260,12 @@ export function OnboardingFlow({
               onRefresh={refresh}
               onBack={back}
               onFinish={finish}
+              manual={manual}
+              setManual={setManual}
+              manualName={manualName}
+              setManualName={setManualName}
+              manualConnector={manualConnector}
+              setManualConnector={setManualConnector}
             />
           )}
         </div>
@@ -289,6 +349,26 @@ function ErrorBubble({ children }: { children: ReactNode }) {
   )
 }
 
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string
+  hint?: string
+  children: ReactNode
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-[12.5px] font-semibold text-ink-soft">
+        {label}
+      </span>
+      {children}
+      {hint && <span className="mt-1.5 block text-[11.5px] text-faint">{hint}</span>}
+    </label>
+  )
+}
+
 /* --------------------------- step 1 ------------------------------- */
 
 function StepTenant({
@@ -312,7 +392,7 @@ function StepTenant({
       <Heading
         eyebrow="Step 1 of 3"
         title="Where's your Atlan?"
-        sub="Type the part before .atlan.com — like acme or pipelines08."
+        sub="Type the part before .atlan.com — like acme. For a dev or custom domain, paste the full host (e.g. main.atlan.dev)."
       />
 
       <div
@@ -325,19 +405,21 @@ function StepTenant({
           autoFocus
           value={prefix}
           onChange={(e) =>
-            setPrefix(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))
+            setPrefix(e.target.value.replace(/[^a-zA-Z0-9.:/-]/g, ''))
           }
           placeholder="your-tenant"
           spellCheck={false}
           autoComplete="off"
           className="min-w-0 flex-1 bg-transparent font-mono text-[22px] tracking-tight text-ink placeholder:text-faint/60 focus:outline-none"
         />
-        <span className="ml-1 select-none font-mono text-[22px] text-faint">
-          .atlan.com
-        </span>
+        {isBarePrefix(prefix) && (
+          <span className="ml-1 select-none font-mono text-[22px] text-faint">
+            .atlan.com
+          </span>
+        )}
       </div>
       <p className="mt-2 pl-1 text-[12px] text-faint">
-        Letters, numbers, and dashes.
+        A tenant name, or a full host for dev / custom domains.
       </p>
 
       <Footer
@@ -369,6 +451,7 @@ function StepToken({
   busy,
   onBack,
   onContinue,
+  onManual,
 }: {
   host: string
   token: string
@@ -379,6 +462,7 @@ function StepToken({
   busy: boolean
   onBack: () => void
   onContinue: () => void
+  onManual: () => void
 }) {
   return (
     <div>
@@ -436,6 +520,16 @@ function StepToken({
 
         {tokenIssue && <ErrorBubble>{tokenIssue}</ErrorBubble>}
         {error && <ErrorBubble>{error}</ErrorBubble>}
+
+        {tokenLooksOk && (
+          <button
+            type="button"
+            onClick={onManual}
+            className="self-start px-1 text-[12px] font-medium text-muted underline-offset-2 transition-colors hover:text-ink hover:underline"
+          >
+            Skip discovery and enter a connection manually →
+          </button>
+        )}
       </div>
 
       <Footer
@@ -469,6 +563,12 @@ function StepConnection({
   onRefresh,
   onBack,
   onFinish,
+  manual,
+  setManual,
+  manualName,
+  setManualName,
+  manualConnector,
+  setManualConnector,
 }: {
   host: string
   connections: AtlanConnection[]
@@ -479,8 +579,85 @@ function StepConnection({
   onRefresh: () => void
   onBack: () => void
   onFinish: () => void
+  manual: boolean
+  setManual: (v: boolean) => void
+  manualName: string
+  setManualName: (v: string) => void
+  manualConnector: string
+  setManualConnector: (v: string) => void
 }) {
   const empty = connections.length === 0
+
+  if (manual) {
+    const ready =
+      manualName.trim().length > 0 && manualConnector.trim().length > 0
+    return (
+      <div>
+        <Heading
+          eyebrow="Step 3 of 3"
+          title="Name your connection"
+          sub="Events post to /events/openlineage/<connector>/api/v1/lineage — enter the connection name and its connector type."
+        />
+        <div className="flex flex-col gap-4">
+          <Field label="Connection name">
+            <input
+              autoFocus
+              value={manualName}
+              onChange={(e) => setManualName(e.target.value)}
+              placeholder="my-openlineage"
+              spellCheck={false}
+              autoComplete="off"
+              className="h-11 w-full rounded-lg border border-line-strong bg-surface px-3 font-mono text-[13.5px] text-ink placeholder:text-faint/60 focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand-ring/40"
+            />
+          </Field>
+          <Field
+            label="Connector type"
+            hint="The slug in the ingest path — e.g. generic-openlineage, spark, airflow."
+          >
+            <input
+              value={manualConnector}
+              onChange={(e) =>
+                setManualConnector(e.target.value.replace(/[^a-z0-9-]/g, ''))
+              }
+              placeholder="generic-openlineage"
+              spellCheck={false}
+              autoComplete="off"
+              className="h-11 w-full rounded-lg border border-line-strong bg-surface px-3 font-mono text-[13.5px] text-ink placeholder:text-faint/60 focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand-ring/40"
+            />
+          </Field>
+        </div>
+
+        {error && <ErrorBubble>{error}</ErrorBubble>}
+
+        <Footer
+          onBack={onBack}
+          primary={
+            <div className="flex items-center gap-4">
+              {connections.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setManual(false)}
+                  className="text-[12.5px] font-medium text-muted transition-colors hover:text-ink"
+                >
+                  Pick from list
+                </button>
+              )}
+              <Button
+                variant="primary"
+                disabled={!ready}
+                onClick={onFinish}
+                icon={Sparkles}
+                className="hover:-translate-y-px"
+              >
+                Finish setup
+              </Button>
+            </div>
+          }
+        />
+      </div>
+    )
+  }
+
   return (
     <div>
       <Heading
@@ -566,6 +743,18 @@ function StepConnection({
           )
         }
       />
+
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          onClick={() => setManual(true)}
+          className="text-[12px] font-medium text-muted underline-offset-2 transition-colors hover:text-ink hover:underline"
+        >
+          {empty
+            ? 'Or enter a connection manually →'
+            : 'Connection not listed? Enter it manually →'}
+        </button>
+      </div>
     </div>
   )
 }

@@ -42,6 +42,8 @@ export interface SessionOverride {
   apiToken?: string
   connectionName?: string
   connectionQualifiedName?: string
+  /** The connector kind — drives the ingest path /events/openlineage/<type>/... */
+  connectionType?: string
   userName?: string
   /** When true (and a token is set), actually send to the tenant. */
   live?: boolean
@@ -122,7 +124,10 @@ export function loadSession(): AtlanSession {
         ov?.connectionName ??
         env.connectionName ??
         DEMO.connection.name,
-      type: injected?.connection?.type ?? DEMO.connection.type,
+      type:
+        injected?.connection?.type ??
+        ov?.connectionType ??
+        DEMO.connection.type,
       qualifiedName:
         injected?.connection?.qualifiedName ??
         ov?.connectionQualifiedName ??
@@ -169,7 +174,13 @@ export function isOnboarded(): boolean {
 export interface OnboardingResult {
   tenantHost: string
   apiToken: string
-  connection: { name: string; qualifiedName: string; guid?: string }
+  connection: {
+    name: string
+    qualifiedName: string
+    guid?: string
+    /** Connector kind (e.g. 'generic-openlineage', 'spark'). Defaults below. */
+    connectorType?: string
+  }
 }
 
 /** Persist the onboarding selection and mark first-run as done. */
@@ -179,6 +190,7 @@ export function completeOnboarding(r: OnboardingResult): AtlanSession {
     apiToken: r.apiToken,
     connectionName: r.connection.name,
     connectionQualifiedName: r.connection.qualifiedName,
+    connectionType: r.connection.connectorType ?? 'generic-openlineage',
     live: true,
   })
   try {
